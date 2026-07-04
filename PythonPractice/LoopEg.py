@@ -11,7 +11,7 @@ print("=====================================")
 for i in range(1, 9, 2):
     print(f"session {i} Python Programming")
 
-    list = ["Apple","Banana","Cherry","Date"]
+list = ["Apple","Banana","Cherry","Date"]
 
 print("=====================================")
 
