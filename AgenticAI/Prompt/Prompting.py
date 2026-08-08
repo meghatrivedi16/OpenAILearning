@@ -100,7 +100,7 @@ prompt = build_dynamic_prompt(
     constraints=input_data.get("constraints")
 )
 
-
+#print(prompt.format(**input_data))
 # 5. Create chain using LCEL
 chain = prompt | llm
 

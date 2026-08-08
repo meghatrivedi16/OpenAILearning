@@ -1,0 +1,39 @@
+uvicorn internal_api.course_api:app --reload --port 8001
+http://localhost:8001
+
+uvicorn agent_app.agent_api:app --reload --port 8000
+http://localhost:8000
+
+
+cd frontend
+python -m http.server 5500
+http://localhost:5500
+
+Browser UI
+   ↓
+Agent API on port 8000
+   ↓
+OpenAI Agent
+   ↓
+Internal course API on port 8001
+   ↓
+External weather API
+   ↓
+Final answer shown in browser
+
+I am a working professional in Bangalore. I want to join the Agentic AI course. Is there a weekend cohort available? What would be the price for a corporate learner? Also, if it is in-person in Bangalore, is the weather okay for attending?
+
+Terminal 1
+Internal API
+http://localhost:8001
+
+Terminal 2
+Agent API
+http://localhost:8000
+
+Terminal 3
+Frontend
+http://localhost:5500
+
+
+

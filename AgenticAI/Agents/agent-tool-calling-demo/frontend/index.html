@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>eLearning Program Advisor Agent</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #1f2937;
+    }
+
+    .subtitle {
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 24px;
+      color: #111827;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      margin-top: 10px;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .examples {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .examples p {
+      margin: 8px 0;
+      cursor: pointer;
+      color: #2563eb;
+    }
+
+    .examples p:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      margin-top: 18px;
+      color: #4b5563;
+      font-style: italic;
+    }
+
+    .answer-card {
+      margin-top: 24px;
+      padding: 22px;
+      background: #f9fafb;
+      border-left: 5px solid #2563eb;
+      border-radius: 10px;
+      line-height: 1.6;
+      color: #1f2937;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      margin-top: 24px;
+      padding: 16px;
+      background: #111827;
+      color: #f9fafb;
+      border-radius: 10px;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>eLearning Program Advisor Agent</h1>
+
+    <p class="subtitle">
+      Ask a course advisory question. The Agent can call internal FastAPI tools
+      for course, cohort, and discount information, and an external weather API
+      for city weather.
+    </p>
+
+    <div class="flow">Browser UI
+   ↓
+FastAPI Agent API
+   ↓
+OpenAI Agent
+   ↓
+Tools:
+  - Internal Course API
+  - Internal Cohort API
+  - Internal Discount API
+  - External Weather API
+   ↓
+Final Advisor Response</div>
+
+    <label for="question">Your Question</label>
+
+    <textarea id="question">I am a working professional in Bangalore. I want to join the Agentic AI course. Is there a weekend cohort available? What would be the price for a corporate learner? Also, if it is in-person in Bangalore, is the weather okay for attending?</textarea>
+
+    <button id="askButton" onclick="askAdvisor()">Ask Advisor Agent</button>
+
+    <div id="status" class="status"></div>
+
+    <div id="answer" class="answer-card" style="display:none;"></div>
+
+    <div class="examples">
+      <strong>Try these prompts:</strong>
+
+      <p onclick="useExample(this)">
+        I am a student. What is the price of the Responsible GenAI course after discount?
+      </p>
+
+      <p onclick="useExample(this)">
+        Do you have any weekend cohort for Agentic AI? I prefer Bangalore.
+      </p>
+
+      <p onclick="useExample(this)">
+        I am new to GenAI. Should I take Agentic AI Foundations or Responsible Generative AI first?
+      </p>
+
+      <p onclick="useExample(this)">
+        I want to attend the Bangalore Agentic AI cohort. Check course details, available seats, and current weather.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:8000/ask-advisor";
+
+    function useExample(element) {
+      document.getElementById("question").value = element.textContent.trim();
+    }
+
+    async function askAdvisor() {
+      const question = document.getElementById("question").value.trim();
+      const statusDiv = document.getElementById("status");
+      const answerDiv = document.getElementById("answer");
+      const button = document.getElementById("askButton");
+
+      answerDiv.style.display = "none";
+      answerDiv.textContent = "";
+      statusDiv.textContent = "";
+
+      if (!question) {
+        statusDiv.textContent = "Please enter a question.";
+        return;
+      }
+
+      button.disabled = true;
+      statusDiv.textContent = "Agent is thinking and calling tools...";
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            question: question
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Request failed");
+        }
+
+        answerDiv.textContent = data.answer;
+        answerDiv.style.display = "block";
+        statusDiv.textContent = "Done.";
+
+      } catch (error) {
+        statusDiv.textContent = "Error: " + error.message;
+      } finally {
+        button.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
